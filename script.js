@@ -46,16 +46,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // --- AFFICHER POP-UP ---
-  function showPresenceOverlay() {
-    awaitingPresence = true;
-    video.pause();
-    playPauseBtn.textContent = "Lecture";
-    presenceOverlay.classList.remove("hidden");
-  }
+function showPresenceOverlay() {
+  awaitingPresence = true;
+  video.pause();
+  playPauseBtn.textContent = "Lecture";
+  presenceOverlay.classList.remove("hidden");
+  presenceOverlay.style.display = "flex"; // force affichage
+}
 
   // --- BOUTON CONTINUER ---
   continueBtn.addEventListener("click", () => {
-    presenceOverlay.classList.add("hidden");
+  presenceOverlay.classList.add("hidden");
+  presenceOverlay.style.display = "none"; // force le retrait visuel immédiat
     awaitingPresence = false;
     lastPresenceTime = video.currentTime; // recalage du timer
     video.play();
