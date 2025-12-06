@@ -7,27 +7,54 @@ document.addEventListener("DOMContentLoaded", () => {
   const continueBtn = document.getElementById("continueBtn");
   const photosBtn = document.getElementById("photosBtn");
 
-  // IMPORTANT : on enlève les contrôles natifs pour éviter l'avance rapide
-  video.removeAttribute("controls");
+  // Durée entre les pop-ups en secondes
+  const PRESENCE_INTERVAL = 30;
 
-  // ⏱️ Checkpoints en secondes où on demande "toujours là ?"
-  // Adapte selon la longueur de ta vidéo
-  const checkpoints = [60, 180]; // 1 min, 3 min, par ex.
-  let nextCheckpointIndex = 0;
   let awaitingPresence = false;
   let hasFinished = false;
+  let lastPresenceTime = 0; // moment où la dernière pop-up a été montrée
 
-  // Lancer la vidéo après le texte d'intro
+  // Enlever les contrôles natifs pour ne pas avancer rapidement
+  video.removeAttribute("controls");
+
+  // Empêcher l'utilisateur d'avancer la vidéo manuellement
+  let lastKnownTime = 0;
+  video.addEventListener("timeupdate", () => {
+    // Si on est en cours de pop-up, ne rien faire
+    if (awaitingPresence || hasFinished) return;
+
+    // Empêcher l'avance manuelle
+    if (video.currentTime > lastKnownTime + 1) {
+      video.currentTime = lastKnownTime;
+    } else {
+      lastKnownTime = video.currentTime;
+    }
+
+    // Vérifier si on doit afficher une pop-up
+    if (video.currentTime - lastPresenceTime >= PRESENCE_INTERVAL) {
+      showPresenceOverlay();
+      lastPresenceTime = video.currentTime; 
+    }
+  });
+
+  video.addEventListener("seeked", () => {
+    // Rembobiner si tentative d'avance
+    if (video.currentTime > lastKnownTime + 1) {
+      video.currentTime = lastKnownTime;
+    }
+  });
+
+  // Démarrage vidéo
   startBtn.addEventListener("click", () => {
     startBtn.classList.add("hidden");
     videoSection.classList.remove("hidden");
-    // Lancer la vidéo (l’utilisateur a interagi, donc OK pour la plupart des navigateurs)
-    video.play().catch(() => {
-      // Si ça bloque, tant pis, l’utilisateur pourra cliquer sur Pause/Play
-    });
+
+    video.play().then(() => {
+      lastKnownTime = 0;
+      lastPresenceTime = 0;
+    }).catch(() => {});
   });
 
-  // Play / Pause custom
   playPauseBtn.addEventListener("click", () => {
     if (video.paused) {
       video.play();
@@ -38,35 +65,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Affichage de l'overlay "présence"
   function showPresenceOverlay() {
     awaitingPresence = true;
     video.pause();
     playPauseBtn.textContent = "Lecture";
+
+    // Empêcher qu'une pop-up ne s'affiche pendant une autre
     presenceOverlay.classList.remove("hidden");
   }
 
   continueBtn.addEventListener("click", () => {
     presenceOverlay.classList.add("hidden");
     awaitingPresence = false;
+
     video.play();
     playPauseBtn.textContent = "Pause";
   });
 
-  // Vérifier les checkpoints pendant la lecture
-  video.addEventListener("timeupdate", () => {
-    if (hasFinished || awaitingPresence) return;
-
-    if (nextCheckpointIndex < checkpoints.length) {
-      const target = checkpoints[nextCheckpointIndex];
-      if (video.currentTime >= target) {
-        nextCheckpointIndex++;
-        showPresenceOverlay();
-      }
-    }
-  });
-
-  // Quand la vidéo se termine → on débloque les photos
+  // Déblocage final
   video.addEventListener("ended", () => {
     hasFinished = true;
     playPauseBtn.disabled = true;
