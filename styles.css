@@ -86,24 +86,23 @@ video {
 }
 
 /* Overlay présence */
-
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.85);
-  display: none; /* on cache par défaut */
+  display: none; /* caché par défaut */
   justify-content: center;
   align-items: center;
   z-index: 999;
   transition: opacity 0.3s ease;
   opacity: 0;
-  pointer-events: none; /* bloquer interactions quand caché */
+  pointer-events: none;
 }
 
 .overlay.show {
   display: flex;
   opacity: 1;
-  pointer-events: auto; /* activer interactions */
+  pointer-events: auto;
 }
 
 .overlay-content {
@@ -116,7 +115,6 @@ video {
 }
 
 /* Section photos */
-
 .photos-section {
   margin-top: 3rem;
   text-align: center;
