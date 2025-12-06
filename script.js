@@ -7,35 +7,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const continueBtn = document.getElementById("continueBtn");
   const photosBtn = document.getElementById("photosBtn");
 
-  video.removeAttribute("controls"); 
-  const PRESENCE_INTERVAL = 30;
-  let awaitingPresence = false;
-  let hasFinished = false;
-  let lastPresenceTime = null;
-  let lastKnownTime = 0;
+  video.removeAttribute("controls");
 
-  // --- LANCEMENT VIDÉO ---
+  const PRESENCE_INTERVAL = 30; // secondes
+  let presenceTimer = null;
+  let hasFinished = false;
+
+  // --- LANCER LA VIDÉO ---
   startBtn.addEventListener("click", () => {
     startBtn.classList.add("hidden");
     videoSection.classList.remove("hidden");
 
-    // force la lecture
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        console.log("Lecture bloquée par le navigateur, cliquez sur Lecture.");
-      });
-    }
-
-    // initialise le timer quand la vidéo commence réellement
-    video.addEventListener("playing", function initTimer() {
-      lastPresenceTime = video.currentTime;
-      lastKnownTime = video.currentTime;
-      video.removeEventListener("playing", initTimer);
+    video.play().catch(() => {
+      console.log("Lecture bloquée, utilisez le bouton Lecture.");
     });
+
+    // timer pop-up toutes les PRESENCE_INTERVAL secondes
+    if (presenceTimer === null) {
+      presenceTimer = setInterval(() => {
+        if (!video.paused && !hasFinished) {
+          showPresenceOverlay();
+        }
+      }, PRESENCE_INTERVAL * 1000);
+    }
   });
 
-  // --- PLAY / PAUSE ---
+  // --- BOUTON PLAY / PAUSE ---
   playPauseBtn.addEventListener("click", () => {
     if (video.paused) {
       video.play().catch(() => {});
@@ -48,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- AFFICHER POP-UP ---
   function showPresenceOverlay() {
-    awaitingPresence = true;
     video.pause();
     playPauseBtn.textContent = "Lecture";
     presenceOverlay.classList.add("show");
@@ -57,26 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- BOUTON CONTINUER ---
   continueBtn.addEventListener("click", () => {
     presenceOverlay.classList.remove("show");
-    awaitingPresence = false;
-    lastPresenceTime = video.currentTime;
     video.play();
     playPauseBtn.textContent = "Pause";
-  });
-
-  // --- CONTRÔLE DE PRÉSENCE ---
-  video.addEventListener("timeupdate", () => {
-    if (awaitingPresence || hasFinished || lastPresenceTime === null) return;
-
-    if (video.currentTime > lastKnownTime + 1) {
-      video.currentTime = lastKnownTime;
-      return;
-    } else {
-      lastKnownTime = video.currentTime;
-    }
-
-    if (video.currentTime - lastPresenceTime >= PRESENCE_INTERVAL) {
-      showPresenceOverlay();
-    }
   });
 
   // --- FIN VIDÉO ---
@@ -84,5 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
     hasFinished = true;
     playPauseBtn.disabled = true;
     photosBtn.classList.remove("hidden");
+    clearInterval(presenceTimer);
   });
 });
