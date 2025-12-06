@@ -91,10 +91,19 @@ video {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.85);
-  display: flex;
+  display: none; /* on cache par défaut */
   justify-content: center;
   align-items: center;
   z-index: 999;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none; /* bloquer interactions quand caché */
+}
+
+.overlay.show {
+  display: flex;
+  opacity: 1;
+  pointer-events: auto; /* activer interactions */
 }
 
 .overlay-content {
