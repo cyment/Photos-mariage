@@ -17,19 +17,33 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastKnownTime = 0;
 
   // --- LANCEMENT VIDÉO ---
-  startBtn.addEventListener("click", () => {
+ startBtn.addEventListener("click", () => {
   startBtn.classList.add("hidden");
   videoSection.classList.remove("hidden");
 
-  video.play().catch(() => {}); // on essaye de lancer la vidéo
+  // on demande explicitement au navigateur de jouer la vidéo
+  const playPromise = video.play();
 
-  // ✅ On attend que la vidéo passe réellement en état playing
+  if (playPromise !== undefined) {
+    playPromise
+      .then(() => {
+        // lecture acceptée par le navigateur
+        // lastPresenceTime sera initialisé dans 'playing' event
+      })
+      .catch(error => {
+        // Si ça bloque, l'utilisateur devra cliquer sur play
+        console.log("Lecture bloquée par le navigateur, cliquez sur lecture.");
+      });
+  }
+
+  // --- INITIALISATION DU TIMER QUAND LA VIDÉO COMMENCE VRAIMENT ---
   video.addEventListener("playing", function initTimer() {
     lastPresenceTime = video.currentTime;
     lastKnownTime = video.currentTime;
-    video.removeEventListener("playing", initTimer); // on ne fait ça qu’une fois
+    video.removeEventListener("playing", initTimer); // ne fait ça qu’une fois
   });
 });
+
 
 video.addEventListener("playing", function resumeTimer() {
   if (lastPresenceTime === null) {
