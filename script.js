@@ -7,54 +7,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const continueBtn = document.getElementById("continueBtn");
   const photosBtn = document.getElementById("photosBtn");
 
-  // Durée entre les pop-ups en secondes
+  // Enlever les contrôles natifs → éviter avance rapide
+  video.removeAttribute("controls");
+
+  // Intervalle entre pop-ups de présence (en secondes)
   const PRESENCE_INTERVAL = 30;
 
   let awaitingPresence = false;
   let hasFinished = false;
-  let lastPresenceTime = 0; // moment où la dernière pop-up a été montrée
+  let lastPresenceTime = null; // sera initialisé quand la vidéo démarre
+  let lastKnownTime = 0;       // sert à détecter avance manuelle
 
-  // Enlever les contrôles natifs pour ne pas avancer rapidement
-  video.removeAttribute("controls");
-
-  // Empêcher l'utilisateur d'avancer la vidéo manuellement
-  let lastKnownTime = 0;
-  video.addEventListener("timeupdate", () => {
-    // Si on est en cours de pop-up, ne rien faire
-    if (awaitingPresence || hasFinished) return;
-
-    // Empêcher l'avance manuelle
-    if (video.currentTime > lastKnownTime + 1) {
-      video.currentTime = lastKnownTime;
-    } else {
-      lastKnownTime = video.currentTime;
-    }
-
-    // Vérifier si on doit afficher une pop-up
-    if (video.currentTime - lastPresenceTime >= PRESENCE_INTERVAL) {
-      showPresenceOverlay();
-      lastPresenceTime = video.currentTime; 
-    }
-  });
-
-  video.addEventListener("seeked", () => {
-    // Rembobiner si tentative d'avance
-    if (video.currentTime > lastKnownTime + 1) {
-      video.currentTime = lastKnownTime;
-    }
-  });
-
-  // Démarrage vidéo
+  // --- LANCEMENT VIDÉO ---------------------------------------
   startBtn.addEventListener("click", () => {
     startBtn.classList.add("hidden");
     videoSection.classList.remove("hidden");
 
-    video.play().then(() => {
-      lastKnownTime = 0;
-      lastPresenceTime = 0;
-    }).catch(() => {});
+    video.play().catch(() => {
+      // Certains navigateurs peuvent bloquer le play auto,
+      // l'utilisateur cliquera sur le bouton play.
+    });
   });
 
+  // --- BOUTON PLAY / PAUSE -----------------------------------
   playPauseBtn.addEventListener("click", () => {
     if (video.paused) {
       video.play();
@@ -65,27 +40,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // --- AFFICHER POP-UP ---------------------------------------
   function showPresenceOverlay() {
     awaitingPresence = true;
     video.pause();
     playPauseBtn.textContent = "Lecture";
-
-    // Empêcher qu'une pop-up ne s'affiche pendant une autre
     presenceOverlay.classList.remove("hidden");
   }
 
+  // --- BOUTON CONTINUER ---------------------------------------
   continueBtn.addEventListener("click", () => {
     presenceOverlay.classList.add("hidden");
     awaitingPresence = false;
+
+    // 🔥 Très important : on recale le minuteur ici
+    lastPresenceTime = video.currentTime;
 
     video.play();
     playPauseBtn.textContent = "Pause";
   });
 
-  // Déblocage final
-  video.addEventListener("ended", () => {
-    hasFinished = true;
-    playPauseBtn.disabled = true;
-    photosBtn.classList.remove("hidden");
-  });
-});
+  // --- SYSTÈME DE CONTRÔLE DE PRÉSENCE ------------------------
+  video.addEventListener("timeupdate", () => {
+    if (awaitingPresence || hasFinished) return;
+
+    // Initialiser le timer du premier contrôle
+    if (lastPresenceTime === null) {
+      lastPresenceTime = video.currentTime;
+    }
+
+    // Empêcher l'avance manuelle
+    if (video.currentTime > lastKnownTime
