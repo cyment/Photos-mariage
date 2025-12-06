@@ -7,50 +7,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const continueBtn = document.getElementById("continueBtn");
   const photosBtn = document.getElementById("photosBtn");
 
-  // Enlever les contrôles natifs → éviter avance rapide
-  video.removeAttribute("controls");
-
-  // Intervalle entre pop-ups de présence (en secondes)
-  const PRESENCE_INTERVAL = 30;
+  video.removeAttribute("controls"); // empêcher l’avance rapide
+  const PRESENCE_INTERVAL = 30;      // intervalle pop-up en secondes
 
   let awaitingPresence = false;
   let hasFinished = false;
-  let lastPresenceTime = null; // sera initialisé quand la vidéo démarre
-  let lastKnownTime = 0;       // sert à détecter avance manuelle
+  let lastPresenceTime = null;       // initialisation après vrai play
+  let lastKnownTime = 0;
 
-  // --- LANCEMENT VIDÉO ---------------------------------------
-startBtn.addEventListener("click", () => {
-  startBtn.classList.add("hidden");
-  videoSection.classList.remove("hidden");
+  // --- LANCEMENT VIDÉO ---
+  startBtn.addEventListener("click", () => {
+    startBtn.classList.add("hidden");
+    videoSection.classList.remove("hidden");
 
-  video.play().then(() => {
-    // ✅ La vidéo a vraiment commencé
-    lastKnownTime = 0;
-    lastPresenceTime = video.currentTime; // on initialise le timer ici
-  }).catch(() => {
-    // Si play échoue, l'utilisateur devra cliquer sur le bouton Play personnalisé
-    lastKnownTime = 0;
-    lastPresenceTime = null; // le timer n'est pas encore actif
-  });
-});
-
-  // --- BOUTON PLAY / PAUSE -----------------------------------
-playPauseBtn.addEventListener("click", () => {
-  if (video.paused) {
     video.play().then(() => {
-      // On initialise lastPresenceTime si ce n'était pas encore fait
-      if (lastPresenceTime === null) {
-        lastPresenceTime = video.currentTime;
-      }
+      // la vidéo a réellement commencé
+      lastKnownTime = video.currentTime;
+      lastPresenceTime = video.currentTime;
+    }).catch(() => {
+      // si play échoue (mobile), attendre interaction sur play/pause
+      lastPresenceTime = null;
     });
-    playPauseBtn.textContent = "Pause";
-  } else {
-    video.pause();
-    playPauseBtn.textContent = "Lecture";
-  }
-});
+  });
 
-  // --- AFFICHER POP-UP ---------------------------------------
+  // --- BOUTON PLAY / PAUSE ---
+  playPauseBtn.addEventListener("click", () => {
+    if (video.paused) {
+      video.play().then(() => {
+        if (lastPresenceTime === null) {
+          lastPresenceTime = video.currentTime; // timer démarré après vrai play
+        }
+      });
+      playPauseBtn.textContent = "Pause";
+    } else {
+      video.pause();
+      playPauseBtn.textContent = "Lecture";
+    }
+  });
+
+  // --- AFFICHER POP-UP ---
   function showPresenceOverlay() {
     awaitingPresence = true;
     video.pause();
@@ -58,26 +53,37 @@ playPauseBtn.addEventListener("click", () => {
     presenceOverlay.classList.remove("hidden");
   }
 
-  // --- BOUTON CONTINUER ---------------------------------------
+  // --- BOUTON CONTINUER ---
   continueBtn.addEventListener("click", () => {
     presenceOverlay.classList.add("hidden");
     awaitingPresence = false;
-
-    // 🔥 Très important : on recale le minuteur ici
-    lastPresenceTime = video.currentTime;
-
+    lastPresenceTime = video.currentTime; // recalage du timer
     video.play();
     playPauseBtn.textContent = "Pause";
   });
 
-  // --- SYSTÈME DE CONTRÔLE DE PRÉSENCE ------------------------
+  // --- SYSTÈME DE CONTRÔLE DE PRÉSENCE ---
   video.addEventListener("timeupdate", () => {
-    if (awaitingPresence || hasFinished) return;
+    if (awaitingPresence || hasFinished || lastPresenceTime === null) return;
 
-    // Initialiser le timer du premier contrôle
-    if (lastPresenceTime === null) {
-      lastPresenceTime = video.currentTime;
+    // empêcher l'avance manuelle
+    if (video.currentTime > lastKnownTime + 1) {
+      video.currentTime = lastKnownTime;
+      return;
+    } else {
+      lastKnownTime = video.currentTime;
     }
 
-    // Empêcher l'avance manuelle
-    if (video.currentTime > lastKnownTime
+    // pop-up toutes les PRESENCE_INTERVAL secondes
+    if (video.currentTime - lastPresenceTime >= PRESENCE_INTERVAL) {
+      showPresenceOverlay();
+    }
+  });
+
+  // --- FIN DE VIDÉO ---
+  video.addEventListener("ended", () => {
+    hasFinished = true;
+    playPauseBtn.disabled = true;
+    photosBtn.classList.remove("hidden");
+  });
+});
