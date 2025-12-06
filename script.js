@@ -19,26 +19,36 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastKnownTime = 0;       // sert à détecter avance manuelle
 
   // --- LANCEMENT VIDÉO ---------------------------------------
-  startBtn.addEventListener("click", () => {
-    startBtn.classList.add("hidden");
-    videoSection.classList.remove("hidden");
+startBtn.addEventListener("click", () => {
+  startBtn.classList.add("hidden");
+  videoSection.classList.remove("hidden");
 
-    video.play().catch(() => {
-      // Certains navigateurs peuvent bloquer le play auto,
-      // l'utilisateur cliquera sur le bouton play.
-    });
+  video.play().then(() => {
+    // ✅ La vidéo a vraiment commencé
+    lastKnownTime = 0;
+    lastPresenceTime = video.currentTime; // on initialise le timer ici
+  }).catch(() => {
+    // Si play échoue, l'utilisateur devra cliquer sur le bouton Play personnalisé
+    lastKnownTime = 0;
+    lastPresenceTime = null; // le timer n'est pas encore actif
   });
+});
 
   // --- BOUTON PLAY / PAUSE -----------------------------------
-  playPauseBtn.addEventListener("click", () => {
-    if (video.paused) {
-      video.play();
-      playPauseBtn.textContent = "Pause";
-    } else {
-      video.pause();
-      playPauseBtn.textContent = "Lecture";
-    }
-  });
+playPauseBtn.addEventListener("click", () => {
+  if (video.paused) {
+    video.play().then(() => {
+      // On initialise lastPresenceTime si ce n'était pas encore fait
+      if (lastPresenceTime === null) {
+        lastPresenceTime = video.currentTime;
+      }
+    });
+    playPauseBtn.textContent = "Pause";
+  } else {
+    video.pause();
+    playPauseBtn.textContent = "Lecture";
+  }
+});
 
   // --- AFFICHER POP-UP ---------------------------------------
   function showPresenceOverlay() {
