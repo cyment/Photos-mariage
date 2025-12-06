@@ -18,13 +18,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- LANCEMENT VIDÉO ---
   startBtn.addEventListener("click", () => {
-    startBtn.classList.add("hidden");
-    videoSection.classList.remove("hidden");
+  startBtn.classList.add("hidden");
+  videoSection.classList.remove("hidden");
 
-    video.play().then(() => {
-      // vidéo réellement démarrée
-      lastKnownTime = video.currentTime;
-      lastPresenceTime = video.currentTime;
-    }).catch(() => {
-      // si play échoue (ex : mobile), attendre interaction sur play/pause
-      lastPresenceTime = null;
+  video.play().catch(() => {}); // on essaye de lancer la vidéo
+
+  // ✅ On attend que la vidéo passe réellement en état playing
+  video.addEventListener("playing", function initTimer() {
+    lastPresenceTime = video.currentTime;
+    lastKnownTime = video.currentTime;
+    video.removeEventListener("playing", initTimer); // on ne fait ça qu’une fois
+  });
+});
+
+video.addEventListener("playing", function resumeTimer() {
+  if (lastPresenceTime === null) {
+    lastPresenceTime = video.currentTime;
+    lastKnownTime = video.currentTime;
+  }
+  video.removeEventListener("playing", resumeTimer);
+});
