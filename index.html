@@ -1,75 +1,38 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Nos photos de mariage</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="styles.css">
-  <script src="script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mariage – Photos & Vidéo</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="page">
-    <section class="intro">
-      <h1>Avant d’accéder aux photos</h1>
-      <p>
-        Le 14 juin, nous nous sommes marié·es entouré·es de vous, et d’un
-        buffet 100 % vegan. Ce choix n’était pas un simple détail logistique. 
-        Il reflète ce que nous considérons juste pour les animaux.
-      </p>
-      <p>
-        Sur le moment, nous n’avons pas pris le temps d’aborder la réalité de la
-        souffrance animale. Aujourd’hui, avant de vous partager les photos de ce
-        jour si important pour nous, nous aimerions vous inviter à regarder
-        cette vidéo. Elle montre ce que vivent les animaux en Suisse pour que
-        d’autres mariages puissent être “comme d’habitude”.
-      </p>
-      <p class="note">
-        👉 Pour accéder aux photos, il faudra regarder la vidéo jusqu’au bout.<br>
-        Nous savons que ce n’est pas simple. Justement, c’est bien le problème.
-      </p>
 
-      <button id="startVideoBtn" class="btn-primary">
-        Lancer la vidéo
-      </button>
-    </section>
+<div id="overlay" class="overlay">
+    <div class="popup">
+        <h2>Bienvenue sur notre page souvenir 💛</h2>
+        <p>Nous avons créé une vidéo très intime et émotionnelle.  
+        Vous pouvez choisir ce que vous préférez :</p>
 
-    <section id="videoSection" class="video-section hidden">
-      <div class="video-wrapper">
-        <video id="mainVideo" preload="metadata">
-          <source src="video/mariage-vegan.mp4" type="video/mp4">
-          Votre navigateur ne supporte pas la vidéo HTML5.
-        </video>
-
-        <div class="controls">
-          <button id="playPauseBtn" class="btn-secondary">
-            Lecture
-          </button>
-        </div>
-      </div>
-
-      <p class="warning">
-        ⚠️ Contenu potentiellement choquant : images réelles d’abattoirs en Suisse.
-      </p>
-    </section>
-
-    <section class="photos-section">
-      <button id="photosBtn" class="btn-primary hidden">
-        Voir les photos du mariage
-      </button>
-    </section>
-  </main>
-
-  <!-- Overlay présence -->
-  <div id="presenceOverlay" class="overlay">
-    <div class="overlay-content">
-      <p>
-        Merci d’être encore là. 💚<br>
-        Cliquez sur “Continuer” pour poursuivre la vidéo.
-      </p>
-      <button id="continueBtn" class="btn-primary">
-        Continuer
-      </button>
+        <button id="watchVideoBtn" class="primary-btn">🎥 Regarder la vidéo</button>
+        <button id="skipBtn" class="secondary-btn">🤝 Accéder aux photos — je choisis de ne pas voir la vidéo</button>
     </div>
-  </div>
+</div>
+
+<div class="content">
+    <div id="videoSection" class="video-section hidden">
+        <video id="weddingVideo" controls>
+            <source src="assets/mariage-vegan.mp4" type="video/mp4">
+            Votre navigateur ne supporte pas la vidéo.
+        </video>
+    </div>
+
+    <div id="photosSection" class="hidden">
+        <h1>Les photos 📸</h1>
+        <p><a href="https://ton-lien-photos.com" target="_blank">Cliquez ici pour accéder aux photos</a></p>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
