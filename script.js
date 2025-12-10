@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   video.removeAttribute("controls");
 
-  const PRESENCE_INTERVAL = 30; // secondes
+  const PRESENCE_INTERVAL = 60; // secondes
   let presenceTimer = null;
   let hasFinished = false;
 
