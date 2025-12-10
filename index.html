@@ -1,38 +1,116 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mariage – Photos & Vidéo</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Avant d’accéder aux photos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
 </head>
+
 <body>
+  <main class="page">
+    <h1>Avant d’accéder aux photos</h1>
 
-<div id="overlay" class="overlay">
-    <div class="popup">
-        <h2>Bienvenue sur notre page souvenir 💛</h2>
-        <p>Nous avons créé une vidéo très intime et émotionnelle.  
-        Vous pouvez choisir ce que vous préférez :</p>
+    <section class="intro">
+      <p>
+        Le jour de nos épousailles, nous avons volontairement évité d’aborder ce sujet afin de préserver la
+        légèreté et la célébration. Aujourd’hui, avant de partager les photos de cette journée importante pour
+        nous, nous souhaitons vous proposer de regarder ce que signifie concrètement ce choix.
+      </p>
 
-        <button id="watchVideoBtn" class="primary-btn">🎥 Regarder la vidéo</button>
-        <button id="skipBtn" class="secondary-btn">🤝 Accéder aux photos — je choisis de ne pas voir la vidéo</button>
-    </div>
-</div>
+      <p>
+        La vidéo ci-dessous contient des images difficiles.  
+        Elle montre l’abattage d’animaux en Suisse. Pas dans un pays lointain. Pas dans des cas extrêmes. Ici.
+        Selon nos normes. Selon nos lois.
+      </p>
 
-<div class="content">
-    <div id="videoSection" class="video-section hidden">
-        <video id="weddingVideo" controls>
-            <source src="assets/mariage-vegan.mp4" type="video/mp4">
-            Votre navigateur ne supporte pas la vidéo.
-        </video>
-    </div>
+      <p>
+        Ce que vous allez voir ne montre qu’une partie de la réalité :  
+        pas l’élevage, pas les conditions de vie, pas les séparations, pas les transports.  
+        Seulement la fin.
+      </p>
 
-    <div id="photosSection" class="hidden">
-        <h1>Les photos 📸</h1>
-        <p><a href="https://ton-lien-photos.com" target="_blank">Cliquez ici pour accéder aux photos</a></p>
-    </div>
-</div>
+      <p>
+        Il est important de préciser une chose :  
+        la viande locale, la viande bio, la viande achetée chez le boucher du coin finit ici.  
+        Dans un abattoir. Celui de la région, ou un autre.  
+        Il n’existe pas de filière « à part » où les animaux échapperaient à cette étape.
+      </p>
 
-<script src="script.js"></script>
+      <p>
+        On évoque souvent l’idée d’une mise à mort “respectueuse”.  
+        Pourtant, retirer la vie à un individu qui cherche à vivre n’est pas un acte respectueux.  
+        En Suisse, comme ailleurs, de nombreuses vidéos documentent différentes pratiques : ce que vous voyez ici
+        n’est ni isolé ni exceptionnel.
+      </p>
+
+      <p>
+        Le terme “bien-être animal” est souvent utilisé pour rassurer.  
+        Mais le premier fondement du bien-être est la vie elle-même.  
+        Abréger une existence à une fraction de ce qu’elle pourrait être n’en fait pas partie.
+      </p>
+
+      <p>
+        Beaucoup de personnes disent aimer les animaux.  
+        Nous vous invitons simplement à regarder quelles sont les conséquences concrètes de cet amour lorsqu’il
+        s’exprime par leur consommation.
+      </p>
+
+      <p>
+        Pour accéder aux photos, vous êtes libres de regarder la vidéo ou non.  
+        Ces animaux, eux, n’ont pas eu le choix.
+      </p>
+
+      <p>
+        Notre but n’est pas de culpabiliser.  
+        L’élevage est considéré comme normal, et nous avons nous-mêmes consommé des produits animaux pendant la
+        majeure partie de notre vie avant de réellement comprendre ce que cela impliquait.
+      </p>
+
+      <h2>Pour aller plus loin ⬇️</h2>
+
+      <p>
+        <strong>Source de la vidéo :</strong><br>
+        <a href="https://observatoireduspecisme.ch/nos-dossiers/enquetes-en-abattoirs/enquete-dans-labattoir-davenches/" target="_blank">
+          Observatoire du spécisme – Enquête dans l’abattoir d’Avenches
+        </a>
+      </p>
+
+      <p>
+        <strong>Réponses aux réactions les plus courantes :</strong><br>
+        <a href="https://www.planetevegan.com/repondre-arguments-anti-vegans/" target="_blank">
+          Planète Vegan – Répondre aux arguments anti-végans
+        </a>
+      </p>
+
+      <p>
+        Si vous souhaitez nous écrire — après avoir pris le temps de consulter ces ressources — le dialogue est ouvert.
+        Nous vous demandons simplement de le faire à partir d’une base commune d’informations.
+      </p>
+
+      <p><em>Merci d’être allé·es jusqu’au bout.</em></p>
+    </section>
+
+    <!-- VIDEO -->
+    <section class="video-section">
+      <video id="mainVideo" controls preload="metadata">
+        <source src="video/mariage-vegan.mp4" type="video/mp4">
+        Votre navigateur ne supporte pas la vidéo HTML5.
+      </video>
+    </section>
+
+    <!-- BUTTONS -->
+    <section class="buttons">
+      <a id="skipBtn" class="btn-secondary" href="https://example.com/photos" target="_blank">
+        Accéder aux photos — je choisis de ne pas voir la vidéo
+      </a>
+
+      <a id="afterVideoBtn" class="btn-primary hidden" href="https://example.com/photos" target="_blank">
+        Bravo d’avoir regardé
+      </a>
+    </section>
+
+  </main>
 </body>
 </html>
